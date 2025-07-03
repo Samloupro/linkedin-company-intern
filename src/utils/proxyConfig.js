@@ -1,1 +1,1 @@
-export const proxyKey = "89.23.80.107:12323:14a5ae8054d88:7535cfe95d";
+export const proxyKey = "geo.iproyal.com:12321:WIISSEE:WISE1230";
