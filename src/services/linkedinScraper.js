@@ -1,18 +1,16 @@
 import retryFetch from '../utils/retryFetch.js';
+import { proxyKey } from '../utils/proxyConfig.js'; // Import the new proxyKey
 import { extractJsonLd, getOrganizationData } from './linkedin/jsonLdProcessor.js';
 import { extractCompanyDetails, extractPublications, extractSimilarCompanies } from './linkedin/dataExtractors.js';
 
 export async function scrapeCompanyData(url, requestHeaders, env) {
-  // Retrieve ISP proxy credentials from KV binding "PROXY_CREDENTIALS"
-  const proxyCredentials = await env.KV_PROXY.get("iproyal");
-  if(proxyCredentials){
-     console.log("Using proxy ISP:", proxyCredentials);
-  }
+  // Using hardcoded residential proxy for testing
+  console.log("Using residential proxy:", proxyKey);
 
   const response = await retryFetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (compatible; Cloudflare-Worker/1.0)',
-      ...(proxyCredentials ? { "X-Proxy": proxyCredentials } : {})
+      "X-Proxy": proxyKey // Use the hardcoded proxyKey directly
     },
     timeout: 5000
   });
