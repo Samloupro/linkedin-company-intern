@@ -28,6 +28,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   if (orgDataError) {
     return { error: orgDataError };
   }
+  console.log("Organization data:", organization);
 
   // Extract other company details
   const companyDetails = extractCompanyDetails(html, jsonLd, organization, finalUrl);
