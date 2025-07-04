@@ -3,9 +3,16 @@ import { processRequest } from '../services/requestProcessor.js';
 import { checkCache, storeCache } from '../services/cacheManager.js';
 import { scrapeCompanyData } from '../services/linkedinScraper.js';
 import { formatCompanyResponse } from '../services/responseFormatter.js'; // New import
+import { clearAllCache } from '../services/cacheManager.js'; // Import clearAllCache
 
 export default {
   async fetch(request, env, ctx) {
+    const requestUrl = new URL(request.url);
+    if (requestUrl.pathname === '/clear-cache') {
+      await clearAllCache();
+      return new Response("Cache cleared successfully!", { status: 200 });
+    }
+
     // Validate the API key using KV
     const { error: apiKeyError } = await validateApiKey(request, env);
     if (apiKeyError) {
