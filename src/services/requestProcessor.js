@@ -5,6 +5,11 @@ export async function processRequest(request) {
   if (request.method === "POST") {
     const body = await request.json();
     url = body.url;
+    // Normalize LinkedIn company URLs
+    const linkedinCompanyMatch = url.match(/^(https?:\/\/(?:www\.)?linkedin\.com\/company\/[^\/]+)\/?/);
+    if (linkedinCompanyMatch && linkedinCompanyMatch[1]) {
+      url = linkedinCompanyMatch[1] + '/'; // Ensure trailing slash for consistency
+    }
     // If 'cache' is explicitly false in the body, then disable cache
     if (body.cache === false) {
       useCache = false;
