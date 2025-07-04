@@ -12,11 +12,10 @@ export function storeCache(cacheKey, response, ctx) {
 }
 
 export async function clearCache() {
-  const cache = await caches.default;
-  const keys = await cache.keys();
-  for (const key of keys) {
-    await cache.delete(key);
-  }
+  // Cloudflare Workers Cache API does not support cache.keys() or iterating over cache entries.
+  // The current approach of incrementing CACHE_VERSION effectively invalidates old cache entries
+  // by making them inaccessible with the new cache key.
+  // Old entries will eventually expire based on their TTL.
   CACHE_VERSION++;
   console.log("Cache cleared. New cache version:", CACHE_VERSION);
   return CACHE_VERSION;
