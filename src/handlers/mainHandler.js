@@ -3,15 +3,9 @@ import { processRequest } from '../services/requestProcessor.js';
 import { checkCache, storeCache, clearCache } from '../services/cacheManager.js';
 import { scrapeCompanyData } from '../services/linkedinScraper.js';
 import { formatCompanyResponse } from '../services/responseFormatter.js'; // New import
-import { clearAllCache } from '../services/cacheManager.js'; // Import clearAllCache
 
 export default {
   async fetch(request, env, ctx) {
-    const requestUrl = new URL(request.url);
-    if (requestUrl.pathname === '/clear-cache') {
-      await clearAllCache();
-      return new Response("Cache cleared successfully!", { status: 200 });
-    }
 
     // Validate the API key using KV
     const { error: apiKeyError } = await validateApiKey(request, env);
@@ -20,8 +14,8 @@ export default {
     }
 
     const urlObj = new URL(request.url);
-if (urlObj.pathname === "/clear-cache") {
-      const newVersion = clearCache();
+    if (urlObj.pathname === "/clear-cache") {
+      const newVersion = await clearCache();
       console.log("Cache cleared. New cache version:", newVersion);
       return new Response(JSON.stringify({ message: "Cache cleared", newVersion }), {
         status: 200,
