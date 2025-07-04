@@ -1,24 +1,23 @@
 export function extractJsonLd(html) {
   const jsonLdMatch = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
-  let jsonLd = {};
-  if (jsonLdMatch) {
-    try {
-      jsonLd = JSON.parse(jsonLdMatch[1]);
-    } catch (e) {
-      return {
-        error: new Response(JSON.stringify({ error: "Invalid JSON-LD format" }), { status: 400 })
-      };
-    }
+  if (!jsonLdMatch) {
+    return { jsonLd: null, error: "JSON-LD script tag not found." };
   }
-  return { jsonLd };
+  try {
+    const jsonLd = JSON.parse(jsonLdMatch[1]);
+    return { jsonLd, error: null };
+  } catch (e) {
+    return { jsonLd: null, error: "Invalid JSON-LD format." };
+  }
 }
 
 export function getOrganizationData(jsonLd) {
-  const organization = jsonLd['@graph']?.find(item => item['@type'] === 'Organization');
-  if (!organization) {
-    return {
-      error: new Response(JSON.stringify({ error: "Company data not found" }), { status: 404 })
-    };
+  if (!jsonLd || !jsonLd['@graph']) {
+    return { organization: null, error: "Invalid JSON-LD structure: @graph is missing." };
   }
-  return { organization };
+  const organization = jsonLd['@graph'].find(item => item && item['@type'] === 'Organization');
+  if (!organization) {
+    return { organization: null, error: "Company data not found in JSON-LD @graph." };
+  }
+  return { organization, error: null };
 }

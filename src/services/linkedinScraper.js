@@ -28,9 +28,6 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   if (orgDataError) {
     return { error: orgDataError };
   }
-  if (!organization) {
-    return { error: "Organization data could not be extracted from JSON-LD." };
-  }
   console.log("Organization data:", organization);
 
   // Extract other company details
