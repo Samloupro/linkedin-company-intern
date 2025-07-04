@@ -11,7 +11,8 @@ export function formatCompanyResponse(scrapedData) {
     employees,
     followers,
     publications,
-    similarPages
+    similarPages,
+    companyLogo
   } = scrapedData;
 
   const result = {
@@ -22,7 +23,8 @@ export function formatCompanyResponse(scrapedData) {
         "company_description": organization.description || "",
         "founded_year": foundedYear,
         "company_website": organization.sameAs || "",
-        "company_linkedin_url": finalUrl
+        "company_linkedin_url": finalUrl,
+        "company_logo_url": companyLogo
       },
       "company_classification": {
         "industry": industry,

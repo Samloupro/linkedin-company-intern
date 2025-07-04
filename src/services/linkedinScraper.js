@@ -38,6 +38,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   return {
     organization, // Pass the organization object directly
     finalUrl, // Pass finalUrl directly
+    companyLogo: companyDetails.company_logo,
     foundedYear: companyDetails.founded_year,
     specialties: companyDetails.specialties,
     industry: companyDetails.industry,
