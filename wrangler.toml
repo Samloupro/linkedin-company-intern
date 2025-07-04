@@ -14,5 +14,6 @@ enabled = true
 binding = "KV_PROXY"
 id = "86af15cd5a96445e921618842e38abd8"
 
-[vars]
-AUTH_WORKER_URL = "https://nwita-authorization.samloupro.workers.dev"
+[[services]]
+binding = "AUTH_SERVICE"
+service = "nwita-authorization"
