@@ -41,11 +41,17 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   const headquartersMatch = html.match(/<dt[^>]*>\s*Headquarters\s*<\/dt>[\s\S]*?<dd[^>]*>([\s\S]*?)<\/dd>/);
   const headquarters = headquartersMatch ? headquartersMatch[1].replace(/<[^>]+>/g, "").trim() : "";
 
+  // Extract company logo
+  const companyLogo = organization.logo?.contentUrl ||
+                      html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1] ||
+                      "";
+
   return {
     company_name: organization.name,
     company_slogan: organization.slogan || "",
     company_website: organization.sameAs || "",
     company_linkedin_url: finalUrl,
+    company_logo: companyLogo, // Add this line
     founded_year: foundedYear,
     specialties: specialties,
     industry: industry,
