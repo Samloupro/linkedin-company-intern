@@ -35,23 +35,32 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   const similarPages = extractSimilarCompanies(html);
 
   return {
-    company_identity: { // New object for company identity
-      company_name: organization.name,
-      company_slogan: organization.slogan || "",
-      company_website: organization.sameAs || "",
-      company_linkedin_url: finalUrl,
-      company_logo: companyDetails.company_logo,
+    company_info: { // New wrapper object
+      company_identity: {
+        company_name: organization.name,
+        company_slogan: organization.slogan || "",
+        company_website: organization.sameAs || "",
+        company_linkedin_url: finalUrl,
+        company_logo: companyDetails.company_logo,
+        company_description: organization.description || "", // Moved here
+        founded_year: companyDetails.founded_year, // Moved here
+      },
+      company_classification: { // New object
+        industry: companyDetails.industry,
+        specialties: companyDetails.specialties,
+        number_of_employees: companyDetails.number_of_employees,
+        followers: companyDetails.followers,
+      },
+      company_address: { // New object
+        headquarters: companyDetails.headquarters,
+        full_address: companyDetails.company_address.full_address,
+        street_address: companyDetails.company_address.street_address || "",
+        address_locality: companyDetails.company_address.address_locality || "",
+        postal_code: companyDetails.company_address.postal_code || "",
+        country: companyDetails.company_address.country || ""
+      }
     },
-    organization, // Keep organization object directly if needed elsewhere
-    foundedYear: companyDetails.founded_year,
-    specialties: companyDetails.specialties,
-    industry: companyDetails.industry,
-    headquarters: companyDetails.headquarters,
-    fullAddress: companyDetails.company_address.full_address,
-    address: companyDetails.company_address, // Pass full address object
-    employees: companyDetails.number_of_employees,
-    followers: companyDetails.followers,
-    publications,
+    publications, // publications and similarPages remain at top level
     similarPages
   };
 }
