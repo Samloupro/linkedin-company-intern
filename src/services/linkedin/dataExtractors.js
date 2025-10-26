@@ -8,12 +8,14 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
 
   // Fallback to HTML parsing if JSON-LD address components are missing
   if (!streetAddress || !addressLocality || !addressRegion || !postalCode || !country) { // Added addressRegion to condition
+            console.log("HTML parsing fallback for address initiated.");
       const addressDivMatch = html.match(/<div[^>]*id="address-0"[^>]*>([\s\S]*?)<\/div>/i);
       if (addressDivMatch && addressDivMatch[1]) {
           const pTags = addressDivMatch[1].match(/<p>([\s\S]*?)<\/p>/gi);
           if (pTags && pTags.length >= 2) {
               // First p tag usually contains street address
               streetAddress = streetAddress || pTags[0].replace(/<[^>]+>/g, "").trim();
+                            console.log(`Street address from HTML: ${streetAddress}`);
 
               // Second p tag usually contains city, state, postal code, country
               const secondPTextContent = pTags[1].replace(/<[^>]+>/g, "").trim(); // Renamed to avoid redeclaration
@@ -64,6 +66,50 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     postalCode,
     country
   ].filter(part => part).join(', ');
+
+  // Fallback: If individual address components are still missing, try to extract them from fullAddress
+  if (fullAddress && (!streetAddress || !addressLocality || !addressRegion || !postalCode || !country)) {
+      console.log(`Fallback to full_address parsing initiated. full_address: "${fullAddress}"`);
+      // Regex to split common address patterns: street, city, region, postalCode, country
+      // This is a simplified regex and might need adjustments for very complex/varied address formats
+      const parts = fullAddress.split(',').map(p => p.trim());
+      console.log("Address parts:", parts);
+
+      // Attempt to extract from 'parts' (heuristics based on common address formats)
+      // Prioritize from right to left as country/postal code are often at the end
+
+      if (parts.length > 0 && !country) {
+          const lastPart = parts[parts.length - 1];
+          if (lastPart.match(/^[A-Z]{2}$/i) || ["US", "DE", "FR", "IN", "IE", "PH", "SG", "AU", "CA", "CH", "NL", "CO", "ES", "MX", "AR", "PL", "BR"].includes(lastPart.toUpperCase())) {
+              country = lastPart;
+          }
+      }
+
+      if (parts.length > 0 && !postalCode) {
+          const potentialPostalCode = parts.find(part => part.match(/^\d{5}(?:-\d{4})?$|^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i));
+          if (potentialPostalCode) {
+              postalCode = potentialPostalCode;
+          }
+      }
+
+      if (parts.length > 0 && !addressRegion) {
+        const potentialRegion = parts.find(part => part.match(/^[A-Z]{2}$/) || part.length > 2); // Two-letter state or longer region name
+        if (potentialRegion && potentialRegion !== country && potentialRegion !== postalCode) { // Avoid re-using country or postalCode
+          addressRegion = potentialRegion;
+        }
+      }
+
+      // Remaining parts could be locality or street address
+      const remainingParts = parts.filter(part => part !== country && part !== postalCode && part !== addressRegion);
+
+      if (remainingParts.length > 0 && !addressLocality) {
+          addressLocality = remainingParts[remainingParts.length - 1];
+      }
+      if (remainingParts.length > 1 && !streetAddress) {
+          streetAddress = remainingParts.slice(0, remainingParts.length -1).join(', ');
+      }
+  }
+
 
   // Update the address object to use the newly extracted or defaulted values
   const updatedAddress = {
