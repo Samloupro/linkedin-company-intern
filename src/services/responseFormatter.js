@@ -13,7 +13,8 @@ export function formatCompanyResponse(scrapedData) {
     publications,
     similarPages,
     companyLogo,
-    companyCoverImage
+    companyCoverImage,
+    funding
   } = scrapedData;
 
   const result = {
@@ -42,7 +43,8 @@ export function formatCompanyResponse(scrapedData) {
         "address_region": address.address_region || "",
         "postal_code": address.postal_code || "",
         "country": address.country || ""
-      }
+      },
+      "funding": funding ? funding.Funding : {}
     },
     "recent_publications": publications,
     "similar_companies": similarPages

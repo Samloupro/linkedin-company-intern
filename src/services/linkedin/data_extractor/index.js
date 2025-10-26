@@ -40,8 +40,9 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
 
   // Extract funding information
   const fundingData = extractFunding(html);
+  console.log("Index - Funding data received from extractFunding:", JSON.stringify(fundingData, null, 2));
 
-  return {
+  const result = {
     company_info: {
       company_identity: {
         company_name: companyGeneralInfo.company_name,
