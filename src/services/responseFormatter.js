@@ -35,10 +35,11 @@ export function formatCompanyResponse(scrapedData) {
       "company_address": {
         "headquarters": headquarters,
         "full_address": fullAddress,
-        "street_address": address.streetAddress || "",
-        "address_locality": address.addressLocality || "",
-        "postal_code": address.postalCode || "",
-        "country": address.addressCountry || ""
+        "street_address": address.street_address || "",
+        "address_locality": address.address_locality || "",
+        "address_region": address.address_region || "",
+        "postal_code": address.postal_code || "",
+        "country": address.country || ""
       }
     },
     "recent_publications": publications,
