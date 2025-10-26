@@ -22,7 +22,6 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
         addressDetails = { ...addressDetails, ...extracted };
       }
   } catch (error) {
-      console.error("Error extracting address details:", error);
       // If an error occurs, addressDetails retains its default empty values
   }
 
@@ -40,7 +39,6 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
 
   // Extract funding information
   const fundingData = extractFunding(html);
-  console.log("Index - Funding data received from extractFunding:", JSON.stringify(fundingData, null, 2));
 
   const result = {
     company_info: {

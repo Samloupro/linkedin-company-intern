@@ -16,7 +16,6 @@ export default {
     const urlObj = new URL(request.url);
     if (urlObj.pathname === "/clear-cache") {
       const newVersion = await clearCache();
-      console.log("Cache cleared. New cache version:", newVersion);
       return new Response(JSON.stringify({ message: "Cache cleared", newVersion }), {
         status: 200,
         headers: { "Content-Type": "application/json" }
@@ -38,17 +37,11 @@ export default {
         cacheKey = cacheResult.cacheKey;
 
         if (cachedResponse) {
-            console.log(`Cache HIT for URL: ${url}`);
             return cachedResponse; // Return cached response if it exists
-        } else {
-            console.log(`Cache MISS for URL: ${url}`);
         }
-    } else {
-        console.log(`Cache BYPASSED for URL: ${url}`);
     }
 
     try {
-      console.log(`Initiating data scraping for URL: ${url}`);
       // Scrape company data
       const { error: scrapeError, ...scrapedData } = await scrapeCompanyData(url, request.headers, env);
       if (scrapeError) {
@@ -70,7 +63,6 @@ export default {
 
       return finalResponse;
     } catch (error) {
-      console.error("Worker error:", error, error.type ? "Type: " + error.type : "");
       return new Response(JSON.stringify({ error: error.message }), {
           status: 500,
           headers: { "Content-Type": "application/json" }

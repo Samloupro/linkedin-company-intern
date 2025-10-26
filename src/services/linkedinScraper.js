@@ -26,7 +26,6 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   if (orgDataError) {
     return { error: orgDataError };
   }
-  console.log("Organization data:", organization);
 
   // Extract all company details using the orchestrator
   const companyDetails = extractCompanyDetails(html, jsonLd, organization, finalUrl);
@@ -48,7 +47,5 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     companyCoverImage: companyDetails.company_info.company_identity.company_cover_image,
     funding: companyDetails.company_info.funding
   };
-
-  console.log("Final scrapeCompanyData result before return:", JSON.stringify(finalResult, null, 2));
   return finalResult;
 }
