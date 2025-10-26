@@ -157,13 +157,17 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   const companyLogo = organization.logo?.contentUrl ||
                       html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1] ||
                       "";
+    // Extract cover image
+  const coverImageMatch = html.match(/<img class="cover-img__image[^>]*" src="([^"]*)"/i);
+  const companyCoverImage = coverImageMatch ? coverImageMatch[1] : "";
 
   return {
     company_name: organization.name,
     company_slogan: organization.slogan || "",
     company_website: organization.sameAs || "",
     company_linkedin_url: finalUrl,
-    company_logo: companyLogo, // Add this line
+    company_logo: companyLogo,
+    company_cover_image: companyCoverImage,
     founded_year: foundedYear,
     specialties: specialties,
     industry: industry,

@@ -48,6 +48,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     employees: companyDetails.number_of_employees,
     followers: companyDetails.followers,
     publications,
-    similarPages
+    similarPages,
+    companyCoverImage: companyDetails.company_cover_image
   };
 }
