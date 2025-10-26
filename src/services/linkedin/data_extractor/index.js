@@ -41,7 +41,7 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Extract funding information
   const fundingData = extractFunding(html);
 
-  const result = {
+  return {
     company_info: {
       company_identity: {
         company_name: companyGeneralInfo.company_name,
@@ -73,7 +73,4 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     recent_publications: publications,
     similar_companies: similarPages
   };
-
-  console.log("Final company_info.company_address object before return:", JSON.stringify(result.company_info.company_address));
-  return result;
 }

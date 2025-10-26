@@ -4,8 +4,6 @@ import { extractJsonLd, getOrganizationData } from './linkedin/jsonLdProcessor.j
 import { extractCompanyDetails } from './linkedin/data_extractor/index.js';
 
 export async function scrapeCompanyData(url, requestHeaders, env) {
-  // Using hardcoded residential proxy for testing
-  console.log("Using residential proxy:", proxyKey);
 
   const response = await retryFetch(url, {
     headers: {
@@ -33,7 +31,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   // Extract all company details using the orchestrator
   const companyDetails = extractCompanyDetails(html, jsonLd, organization, finalUrl);
 
-  return {
+  const finalResult = {
     organization, // Pass the organization object directly
     finalUrl, // Pass finalUrl directly
     companyLogo: companyDetails.company_info.company_identity.company_logo,
@@ -50,4 +48,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     companyCoverImage: companyDetails.company_info.company_identity.company_cover_image,
     funding: companyDetails.company_info.funding
   };
+
+  console.log("Final scrapeCompanyData result before return:", JSON.stringify(finalResult, null, 2));
+  return finalResult;
 }
