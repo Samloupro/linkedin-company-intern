@@ -1,7 +1,7 @@
 import retryFetch from '../utils/retryFetch.js';
 import { proxyKey } from '../utils/proxyConfig.js'; // Import the new proxyKey
 import { extractJsonLd, getOrganizationData } from './linkedin/jsonLdProcessor.js';
-import { extractCompanyDetails, extractPublications, extractSimilarCompanies } from './linkedin/data_extractor/dataExtractors.js';
+import { extractCompanyDetails } from './linkedin/data_extractor/index.js';
 
 export async function scrapeCompanyData(url, requestHeaders, env) {
   // Using hardcoded residential proxy for testing
@@ -30,10 +30,8 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   }
   console.log("Organization data:", organization);
 
-  // Extract other company details
+  // Extract all company details using the orchestrator
   const companyDetails = extractCompanyDetails(html, jsonLd, organization, finalUrl);
-  const publications = extractPublications(jsonLd);
-  const similarPages = extractSimilarCompanies(html);
 
   return {
     organization, // Pass the organization object directly
@@ -47,8 +45,8 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     address: companyDetails.company_address, // Pass full address object
     employees: companyDetails.number_of_employees,
     followers: companyDetails.followers,
-    publications,
-    similarPages,
+    publications: companyDetails.publications, // Get publications from orchestrated details
+    similarPages: companyDetails.similarPages, // Get similarPages from orchestrated details
     companyCoverImage: companyDetails.company_cover_image
   };
 }
