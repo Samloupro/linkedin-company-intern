@@ -25,22 +25,35 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   const fundingData = extractFunding(html);
 
   return {
-    company_name: companyGeneralInfo.company_name,
-    company_slogan: companyGeneralInfo.company_slogan,
-    company_website: companyGeneralInfo.company_website,
-    company_linkedin_url: companyGeneralInfo.company_linkedin_url,
-    company_logo: companyGeneralInfo.company_logo,
-    company_cover_image: companyGeneralInfo.company_cover_image,
-    founded_year: companyGeneralInfo.founded_year,
-    specialties: companyGeneralInfo.specialties,
-    industry: companyGeneralInfo.industry,
-    headquarters: companyGeneralInfo.headquarters,
-    company_address: addressDetails,
-    company_description: companyGeneralInfo.company_description,
-    number_of_employees: employeeFollowerData.employees,
-    followers: employeeFollowerData.followers,
-    publications: publications,
-    similarPages: similarPages,
-    funding: fundingData.Funding
+    company_info: {
+      company_identity: {
+        company_name: companyGeneralInfo.company_name,
+        company_slogan: companyGeneralInfo.company_slogan,
+        company_description: companyGeneralInfo.company_description,
+        founded_year: companyGeneralInfo.founded_year,
+        company_website: companyGeneralInfo.company_website,
+        company_linkedin_url: companyGeneralInfo.company_linkedin_url,
+        company_logo: companyGeneralInfo.company_logo,
+        company_cover_image: companyGeneralInfo.company_cover_image
+      },
+      company_classification: {
+        industry: companyGeneralInfo.industry,
+        specialties: companyGeneralInfo.specialties,
+        number_of_employees: employeeFollowerData.employees,
+        followers: employeeFollowerData.followers
+      },
+      company_address: {
+        headquarters: companyGeneralInfo.headquarters,
+        full_address: addressDetails.full_address || "",
+        street_address: addressDetails.street_address || "",
+        address_locality: addressDetails.address_locality || "",
+        address_region: addressDetails.address_region || "",
+        postal_code: addressDetails.postal_code || "",
+        country: addressDetails.country || ""
+      },
+      funding: fundingData.Funding
+    },
+    recent_publications: publications,
+    similar_companies: similarPages
   };
 }
