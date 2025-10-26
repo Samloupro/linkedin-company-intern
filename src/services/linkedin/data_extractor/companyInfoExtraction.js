@@ -21,17 +21,12 @@ export function extractCompanyGeneralInfo(html, jsonLd, organization, finalUrl) 
                       "";
     // Extract cover image
   const coverImageMatch = html.match(/(<img[^>]*class="cover-img__image[^>]*" src="([^"]*)"[^>]*>)/i);
-  // Log the entire matched img tag for inspection
-  console.log(`Matched cover image HTML fragment: ${coverImageMatch ? coverImageMatch[1] : 'Not Found'}`);
   let companyCoverImage = coverImageMatch ? coverImageMatch[2] : ""; // Capture group 2 is the src attribute value
-
-  console.log(`Raw company cover image URL: ${companyCoverImage}`);
 
   // Decode HTML entities in the URL
   if (companyCoverImage) {
     companyCoverImage = decodeHtmlEntities(companyCoverImage);
   }
-  console.log(`Decoded company cover image URL: ${companyCoverImage}`);
 
   return {
     company_name: organization.name,

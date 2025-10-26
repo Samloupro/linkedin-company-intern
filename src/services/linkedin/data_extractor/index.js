@@ -6,8 +6,14 @@ import { extractSimilarCompanies } from './similarCompaniesExtraction.js';
 import { extractFunding } from './fundingExtraction.js';
 
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
-  // Extract address details
-  const addressDetails = extractAddressDetails(html, jsonLd, organization);
+  // Extract address details with robust error handling
+  let addressDetails = {}; // Initialize to empty object
+  try {
+      addressDetails = extractAddressDetails(html, jsonLd, organization);
+  } catch (error) {
+      console.error("Error extracting address details:", error);
+      // If an error occurs, addressDetails remains {} as initialized
+  }
 
   // Extract general company information
   const companyGeneralInfo = extractCompanyGeneralInfo(html, jsonLd, organization, finalUrl);
