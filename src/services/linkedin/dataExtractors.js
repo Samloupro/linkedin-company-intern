@@ -159,7 +159,12 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
                       "";
     // Extract cover image
   const coverImageMatch = html.match(/<img class="cover-img__image[^>]*" src="([^"]*)"/i);
-  const companyCoverImage = coverImageMatch ? coverImageMatch[1] : "";
+  let companyCoverImage = coverImageMatch ? coverImageMatch[1] : "";
+
+  // Decode HTML entities in the URL, specifically & to &
+  if (companyCoverImage) {
+    companyCoverImage = companyCoverImage.replace(/&/g, '&');
+  }
 
   return {
     company_name: organization.name,
