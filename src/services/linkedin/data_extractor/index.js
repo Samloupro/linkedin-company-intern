@@ -74,4 +74,5 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     recent_publications: publications,
     similar_companies: similarPages
   };
+  return result;
 }
