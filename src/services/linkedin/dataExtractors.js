@@ -1,12 +1,61 @@
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Adresse formatée
-  const address = organization.address || {};
+  let streetAddress = organization.address?.streetAddress || "";
+  let addressLocality = organization.address?.addressLocality || "";
+  let addressRegion = organization.address?.addressRegion || ""; // Added addressRegion initialization
+  let postalCode = organization.address?.postalCode || "";
+  let country = organization.address?.addressCountry || "";
+
+  // Fallback to HTML parsing if JSON-LD address components are missing
+  if (!streetAddress || !addressLocality || !addressRegion || !postalCode || !country) { // Added addressRegion to condition
+      const addressDivMatch = html.match(/<div[^>]*id="address-0"[^>]*>([\s\S]*?)<\/div>/i);
+      if (addressDivMatch && addressDivMatch[1]) {
+          const pTags = addressDivMatch[1].match(/<p>([\s\S]*?)<\/p>/gi);
+          if (pTags && pTags.length >= 2) {
+              // First p tag usually contains street address
+              streetAddress = streetAddress || pTags[0].replace(/<[^>]+>/g, "").trim();
+
+              // Second p tag usually contains city, state, postal code, country
+              const secondPText = pTags[1].replace(/<[^>]+>/g, "").trim();
+              
+              // Apply more robust regex to parse the second p tag
+              const cityStatePostalCountryMatch = secondPText.match(/^(.*?),\s*([A-Z]{2,}),?\s*(\d{5}(?:-\d{4})?)?,?\s*([A-Z]{2,})$/i);
+              if (cityStatePostalCountryMatch) {
+                  addressLocality = addressLocality || cityStatePostalCountryMatch[1].trim();
+                  addressRegion = addressRegion || cityStatePostalCountryMatch[2]?.trim(); // Extracted state/region
+                  postalCode = postalCode || cityStatePostalCountryMatch[3]?.trim();
+                  country = country || cityStatePostalCountryMatch[4].trim();
+              } else {
+                  // Fallback for cases where the format is different (e.g., just City, Country)
+                  const cityCountryMatch = secondPText.match(/^(.*?),\s*([A-Za-z\s]+)$/i);
+                  if (cityCountryMatch) {
+                      addressLocality = addressLocality || cityCountryMatch[1].trim();
+                      country = country || cityCountryMatch[2].trim();
+                  } else {
+                     // For very simple cases like just "City, Country" or "City"
+                     addressLocality = addressLocality || secondPText;
+                  }
+              }
+          }
+      }
+  }
+
   const fullAddress = [
-    address.streetAddress,
-    address.addressLocality,
-    address.postalCode,
-    address.addressCountry
+    streetAddress,
+    addressLocality,
+    addressRegion, // Added addressRegion to fullAddress construction
+    postalCode,
+    country
   ].filter(part => part).join(', ');
+
+  // Update the address object to use the newly extracted or defaulted values
+  const updatedAddress = {
+    streetAddress: streetAddress,
+    addressLocality: addressLocality,
+    addressRegion: addressRegion, // Added addressRegion to updatedAddress
+    postalCode: postalCode,
+    addressCountry: country
+  };
 
   // Nombre d'employés et extraction des followers
   const employees = organization.numberOfEmployees?.value ?? "";
@@ -58,10 +107,11 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     headquarters: headquarters,
     company_address: {
       full_address: fullAddress,
-      street_address: address.streetAddress || "",
-      address_locality: address.addressLocality || "",
-      postal_code: address.postalCode || "",
-      country: address.addressCountry || ""
+      street_address: updatedAddress.streetAddress || "",
+      address_locality: updatedAddress.addressLocality || "",
+      address_region: updatedAddress.addressRegion || "", // Added address_region here
+      postal_code: updatedAddress.postalCode || "",
+      country: updatedAddress.addressCountry || ""
     },
     company_description: organization.description || "",
     number_of_employees: employees,
