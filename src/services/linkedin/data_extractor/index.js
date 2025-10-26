@@ -7,12 +7,23 @@ import { extractFunding } from './fundingExtraction.js';
 
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Extract address details with robust error handling
-  let addressDetails = {}; // Initialize to empty object
+  let addressDetails = { // Initialize with full default structure
+    full_address: "",
+    street_address: "",
+    address_locality: "",
+    address_region: "",
+    postal_code: "",
+    country: ""
+  };
   try {
-      addressDetails = extractAddressDetails(html, jsonLd, organization);
+      const extracted = extractAddressDetails(html, jsonLd, organization);
+      // Merge extracted properties, overwriting defaults
+      if (extracted) {
+        addressDetails = { ...addressDetails, ...extracted };
+      }
   } catch (error) {
       console.error("Error extracting address details:", error);
-      // If an error occurs, addressDetails remains {} as initialized
+      // If an error occurs, addressDetails retains its default empty values
   }
 
   // Extract general company information
@@ -30,7 +41,7 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Extract funding information
   const fundingData = extractFunding(html);
 
-  return {
+  const result = {
     company_info: {
       company_identity: {
         company_name: companyGeneralInfo.company_name,
@@ -62,4 +73,7 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     recent_publications: publications,
     similar_companies: similarPages
   };
+
+  console.log("Final company_info.company_address object before return:", JSON.stringify(result.company_info.company_address));
+  return result;
 }
