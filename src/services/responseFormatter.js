@@ -44,7 +44,7 @@ export function formatCompanyResponse(scrapedData) {
         "postal_code": address.postal_code || "",
         "country": address.country || ""
       },
-      "funding": funding ? funding.Funding : {}
+      "funding": funding || {}
     },
     "recent_publications": publications,
     "similar_companies": similarPages
