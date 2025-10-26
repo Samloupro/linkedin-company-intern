@@ -5,6 +5,11 @@ export async function processRequest(request) {
   if (request.method === "POST") {
     const body = await request.json();
     url = body.url;
+    // Prepend https:// if no protocol is present
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
     // Normalize LinkedIn company URLs
     const linkedinCompanyMatch = url.match(/^(https?:\/\/(?:www\.)?linkedin\.com\/company\/[^\/]+)\/?/);
     if (linkedinCompanyMatch && linkedinCompanyMatch[1]) {
