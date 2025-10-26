@@ -1,7 +1,7 @@
 import retryFetch from '../utils/retryFetch.js';
 import { proxyKey } from '../utils/proxyConfig.js'; // Import the new proxyKey
 import { extractJsonLd, getOrganizationData } from './linkedin/jsonLdProcessor.js';
-import { extractCompanyDetails, extractPublications, extractSimilarCompanies } from './linkedin/dataExtractors.js';
+import { extractCompanyDetails, extractPublications, extractSimilarCompanies } from './linkedin/data_extractor/dataExtractors.js';
 
 export async function scrapeCompanyData(url, requestHeaders, env) {
   // Using hardcoded residential proxy for testing

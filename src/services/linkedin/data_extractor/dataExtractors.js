@@ -1,14 +1,3 @@
-function decodeHtmlEntities(text) {
-  if (typeof text !== 'string') {
-    return text;
-  }
-  return text.replace(/&/g, '&')
-             .replace(/</g, '<')
-             .replace(/>/g, '>')
-             .replace(/"/g, '"')
-             .replace(/&#039;/g, "'");
-}
-
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Adresse formatée
   let streetAddress = organization.address?.streetAddress || "";
@@ -168,14 +157,16 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   const companyLogo = organization.logo?.contentUrl ||
                       html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1] ||
                       "";
-    // Extract cover image
-  const coverImageMatch = html.match(/<img class="cover-img__image[^>]*" src="([^"]*)"/i);
-  let companyCoverImage = coverImageMatch ? coverImageMatch[1] : "";
+  // Extract cover image
+  const coverImageMatch = html.match(/(<img[^>]*class="cover-img__image[^>]*" src="([^"]*)"[^>]*>)/i);
+  // Log the entire matched img tag for inspection
+  console.log(`Matched cover image HTML fragment: ${coverImageMatch ? coverImageMatch[1] : 'Not Found'}`);
+  let companyCoverImage = coverImageMatch ? coverImageMatch[2] : ""; // Capture group 2 is the src attribute value
 
   console.log(`Raw company cover image URL: ${companyCoverImage}`);
 
   // Decode HTML entities in the URL, specifically & to &
-  // Using a simple string replace for compatibility in worker environments
+  // Using a simple string replace as DOMParser is not available in Workers runtime
   if (companyCoverImage) {
     companyCoverImage = companyCoverImage.replace(/&/g, '&');
   }
