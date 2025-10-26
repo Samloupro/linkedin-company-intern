@@ -1,3 +1,14 @@
+function decodeHtmlEntities(text) {
+  if (typeof text !== 'string') {
+    return text;
+  }
+  return text.replace(/&/g, '&')
+             .replace(/</g, '<')
+             .replace(/>/g, '>')
+             .replace(/"/g, '"')
+             .replace(/&#039;/g, "'");
+}
+
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Adresse formatée
   let streetAddress = organization.address?.streetAddress || "";
