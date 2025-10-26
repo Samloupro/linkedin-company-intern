@@ -47,6 +47,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     followers: companyDetails.company_info.company_classification.followers,
     publications: companyDetails.recent_publications,
     similarPages: companyDetails.similar_companies,
-    companyCoverImage: companyDetails.company_info.company_identity.company_cover_image
+    companyCoverImage: companyDetails.company_info.company_identity.company_cover_image,
+    funding: companyDetails.company_info.funding
   };
 }
