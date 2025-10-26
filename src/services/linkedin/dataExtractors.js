@@ -16,25 +16,42 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
               streetAddress = streetAddress || pTags[0].replace(/<[^>]+>/g, "").trim();
 
               // Second p tag usually contains city, state, postal code, country
-              const secondPText = pTags[1].replace(/<[^>]+>/g, "").trim();
-              
-              // Apply more robust regex to parse the second p tag
-              const cityStatePostalCountryMatch = secondPText.match(/^(.*?),\s*([A-Z]{2,}),?\s*(\d{5}(?:-\d{4})?)?,?\s*([A-Z]{2,})$/i);
-              if (cityStatePostalCountryMatch) {
-                  addressLocality = addressLocality || cityStatePostalCountryMatch[1].trim();
-                  addressRegion = addressRegion || cityStatePostalCountryMatch[2]?.trim(); // Extracted state/region
-                  postalCode = postalCode || cityStatePostalCountryMatch[3]?.trim();
-                  country = country || cityStatePostalCountryMatch[4].trim();
-              } else {
-                  // Fallback for cases where the format is different (e.g., just City, Country)
-                  const cityCountryMatch = secondPText.match(/^(.*?),\s*([A-Za-z\s]+)$/i);
-                  if (cityCountryMatch) {
-                      addressLocality = addressLocality || cityCountryMatch[1].trim();
-                      country = country || cityCountryMatch[2].trim();
-                  } else {
-                     // For very simple cases like just "City, Country" or "City"
-                     addressLocality = addressLocality || secondPText;
+              const secondPTextContent = pTags[1].replace(/<[^>]+>/g, "").trim(); // Renamed to avoid redeclaration
+              const secondPTextParts = secondPTextContent.split(',').map(part => part.trim()).filter(part => part !== '');
+
+              // Attempt to find country, postal code, region, and locality from the parts
+              // Prioritize from right to left where patterns are often more distinct
+
+              if (secondPTextParts.length > 0 && !country) {
+                  const lastPart = secondPTextParts[secondPTextParts.length - 1];
+                  // Check for 2-letter country code or common full country names
+                  if (lastPart.match(/^[A-Z]{2}$/i) || ["US", "DE", "FR", "IN", "IE", "PH", "SG", "AU", "CA", "CH", "NL", "CO", "ES", "MX", "AR", "PL", "BR"].includes(lastPart.toUpperCase())) {
+                      country = lastPart;
+                      secondPTextParts.pop();
                   }
+              }
+
+              if (secondPTextParts.length > 0 && !postalCode) {
+                  const lastPart = secondPTextParts[secondPTextParts.length - 1];
+                  // Check for common postal code patterns (e.g., US zip, Canadian postal code)
+                  if (lastPart.match(/^\d{5}(?:-\d{4})?$|^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i)) {
+                      postalCode = lastPart;
+                      secondPTextParts.pop();
+                  }
+              }
+
+              if (secondPTextParts.length > 0 && !addressRegion) {
+                  const lastPart = secondPTextParts[secondPTextParts.length - 1];
+                  // Check for 2-letter state code or a longer region name
+                  if (lastPart.match(/^[A-Z]{2}$/) || lastPart.length > 2) {
+                      addressRegion = lastPart;
+                      secondPTextParts.pop();
+                  }
+              }
+
+              // Whatever remains should ideally be the addressLocality (city)
+              if (secondPTextParts.length > 0 && !addressLocality) {
+                  addressLocality = secondPTextParts.pop();
               }
           }
       }
