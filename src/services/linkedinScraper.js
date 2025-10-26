@@ -36,17 +36,17 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   return {
     organization, // Pass the organization object directly
     finalUrl, // Pass finalUrl directly
-    companyLogo: companyDetails.company_logo,
-    foundedYear: companyDetails.founded_year,
-    specialties: companyDetails.specialties,
-    industry: companyDetails.industry,
-    headquarters: companyDetails.headquarters,
-    fullAddress: companyDetails.company_address.full_address,
-    address: companyDetails.company_address, // Pass full address object
-    employees: companyDetails.number_of_employees,
-    followers: companyDetails.followers,
-    publications: companyDetails.publications, // Get publications from orchestrated details
-    similarPages: companyDetails.similarPages, // Get similarPages from orchestrated details
-    companyCoverImage: companyDetails.company_cover_image
+    companyLogo: companyDetails.company_info.company_identity.company_logo,
+    foundedYear: companyDetails.company_info.company_identity.founded_year,
+    specialties: companyDetails.company_info.company_classification.specialties,
+    industry: companyDetails.company_info.company_classification.industry,
+    headquarters: companyDetails.company_info.company_address.headquarters,
+    fullAddress: companyDetails.company_info.company_address.full_address,
+    address: companyDetails.company_info.company_address,
+    employees: companyDetails.company_info.company_classification.number_of_employees,
+    followers: companyDetails.company_info.company_classification.followers,
+    publications: companyDetails.recent_publications,
+    similarPages: companyDetails.similar_companies,
+    companyCoverImage: companyDetails.company_info.company_identity.company_cover_image
   };
 }
