@@ -161,10 +161,14 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   const coverImageMatch = html.match(/<img class="cover-img__image[^>]*" src="([^"]*)"/i);
   let companyCoverImage = coverImageMatch ? coverImageMatch[1] : "";
 
+  console.log(`Raw company cover image URL: ${companyCoverImage}`);
+
   // Decode HTML entities in the URL, specifically & to &
+  // Using a simple string replace for compatibility in worker environments
   if (companyCoverImage) {
     companyCoverImage = companyCoverImage.replace(/&/g, '&');
   }
+  console.log(`Decoded company cover image URL: ${companyCoverImage}`);
 
   return {
     company_name: organization.name,
