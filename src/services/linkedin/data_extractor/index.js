@@ -3,6 +3,7 @@ import { extractCompanyGeneralInfo } from './companyInfoExtraction.js';
 import { extractEmployeeAndFollowerData } from './employeeFollowerExtraction.js';
 import { extractPublications } from './publicationExtraction.js';
 import { extractSimilarCompanies } from './similarCompaniesExtraction.js';
+import { extractFunding } from './fundingExtraction.js';
 
 export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Extract address details
@@ -20,6 +21,9 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
   // Extract similar companies
   const similarPages = extractSimilarCompanies(html);
 
+  // Extract funding information
+  const fundingData = extractFunding(html);
+
   return {
     company_name: companyGeneralInfo.company_name,
     company_slogan: companyGeneralInfo.company_slogan,
@@ -36,6 +40,7 @@ export function extractCompanyDetails(html, jsonLd, organization, finalUrl) {
     number_of_employees: employeeFollowerData.employees,
     followers: employeeFollowerData.followers,
     publications: publications,
-    similarPages: similarPages
+    similarPages: similarPages,
+    funding: fundingData.Funding
   };
 }
