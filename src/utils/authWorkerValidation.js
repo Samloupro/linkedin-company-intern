@@ -11,7 +11,7 @@ export async function validateApiKey(rawApiKey, env) {
       method: 'POST',
       headers: {
         'Authorization': rawApiKey,
-        'X-Calling-Service': 'linkedin-company'
+        'X-Calling-Endpoint': 'linkedin-company'
       }
     });
 
@@ -20,7 +20,7 @@ export async function validateApiKey(rawApiKey, env) {
     console.log(`[authWorkerValidation]   - Method: ${authRequest.method}`);
     console.log(`[authWorkerValidation]   - URL: ${authRequest.url}`);
     console.log(`[authWorkerValidation]   - Authorization header: ${rawApiKey.substring(0, 15)}...`);
-    console.log(`[authWorkerValidation]   - X-Calling-Service: ${authRequest.headers.get('X-Calling-Service')}`);
+    console.log(`[authWorkerValidation]   - X-Calling-Endpoint: ${authRequest.headers.get('X-Calling-Endpoint')}`);
 
     const authResponse = await env.AUTH_VALIDATION_WORKER.fetch(authRequest);
     console.log(`[authWorkerValidation] Sent request to AUTH_VALIDATION_WORKER binding.`);
