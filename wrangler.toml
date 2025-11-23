@@ -15,5 +15,5 @@ binding = "KV_PROXY"
 id = "86af15cd5a96445e921618842e38abd8"
 
 [[services]]
-binding = "AUTH_SERVICE"
-service = "nwita-authorization"
+binding = "AUTH_VALIDATION_WORKER"
+service = "nwita-authorization-validation"

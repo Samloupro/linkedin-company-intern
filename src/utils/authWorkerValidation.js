@@ -1,10 +1,10 @@
 export async function validateApiKey(rawApiKey, env) {
-  if (!env.AUTH_SERVICE) {
-    console.error("[authWorkerValidation] AUTH_SERVICE binding not configured.");
-    return { isValid: false, error: "AUTH_SERVICE binding not configured." };
+  if (!env.AUTH_VALIDATION_WORKER) {
+    console.error("[authWorkerValidation] AUTH_VALIDATION_WORKER binding not configured.");
+    return { isValid: false, error: "AUTH_VALIDATION_WORKER binding not configured." };
   }
 
-  console.log(`[authWorkerValidation] Validating API key via AUTH_SERVICE binding: ${rawApiKey.substring(0, 10)}...`);
+  console.log(`[authWorkerValidation] Validating API key via AUTH_VALIDATION_WORKER binding: ${rawApiKey.substring(0, 10)}...`);
 
   try {
     const authRequest = new Request(`https://auth-service/Authorization`, {
@@ -15,8 +15,8 @@ export async function validateApiKey(rawApiKey, env) {
       }
     });
 
-    const authResponse = await env.AUTH_SERVICE.fetch(authRequest);
-    console.log(`[authWorkerValidation] Sent request to AUTH_SERVICE binding.`);
+    const authResponse = await env.AUTH_VALIDATION_WORKER.fetch(authRequest);
+    console.log(`[authWorkerValidation] Sent request to AUTH_VALIDATION_WORKER binding.`);
     console.log(`[authWorkerValidation] Auth Worker Response Status: ${authResponse.status} ${authResponse.statusText}`);
 
     if (!authResponse.ok) {
@@ -41,7 +41,7 @@ export async function validateApiKey(rawApiKey, env) {
     }
 
   } catch (error) {
-    console.error(`[authWorkerValidation] Error communicating with AUTH_SERVICE: ${error.message}`);
+    console.error(`[authWorkerValidation] Error communicating with AUTH_VALIDATION_WORKER: ${error.message}`);
     return { isValid: false, error: `Failed to communicate with authentication service: ${error.message}` };
   }
 }
