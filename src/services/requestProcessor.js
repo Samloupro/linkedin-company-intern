@@ -4,7 +4,7 @@ export async function processRequest(request) {
 
   if (request.method === "POST") {
     const body = await request.json();
-    url = body.url;
+    url = body.linkedin_url;
     // Prepend https:// if no protocol is present
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
@@ -30,7 +30,7 @@ export async function processRequest(request) {
 
   if (!url) {
     return {
-      error: new Response(JSON.stringify({ error: "URL is required" }), {
+      error: new Response(JSON.stringify({ error: "linkedin_url is required" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       })
