@@ -5,6 +5,9 @@ import { extractCompanyDetails } from './linkedin/data_extractor/index.js';
 
 export async function scrapeCompanyData(url, requestHeaders, env) {
 
+  // Log proxy usage before making the request
+  console.log(`[linkedinScraper] Using proxy key: ${proxyKey}`);
+
   const response = await retryFetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (compatible; Cloudflare-Worker/1.0)',
@@ -12,6 +15,11 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
     },
     timeout: 5000
   });
+
+  // Log response details to verify proxy was used
+  console.log(`[linkedinScraper] Received response with status ${response.status}`);
+  const remoteIp = response.headers.get('CF-Connecting-IP') || response.headers.get('X-Forwarded-For') || 'unknown';
+  console.log(`[linkedinScraper] Remote IP (via proxy): ${remoteIp}`);
   const finalUrl = response.url;
   const html = await response.text();
 
