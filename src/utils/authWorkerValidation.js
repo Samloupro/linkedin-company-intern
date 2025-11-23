@@ -8,10 +8,10 @@ export async function validateApiKey(rawApiKey, env) {
 
   try {
     const authRequest = new Request(`https://auth-service/Authorization`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Authorization': rawApiKey,
-        'X-Calling-Service': 'nwita-linkedin-company' // Updated for this service
+        'X-Calling-Service': 'linkedin-company'
       }
     });
 
