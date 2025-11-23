@@ -15,6 +15,13 @@ export async function validateApiKey(rawApiKey, env) {
       }
     });
 
+    // Log detailed request information
+    console.log(`[authWorkerValidation] Request details:`);
+    console.log(`[authWorkerValidation]   - Method: ${authRequest.method}`);
+    console.log(`[authWorkerValidation]   - URL: ${authRequest.url}`);
+    console.log(`[authWorkerValidation]   - Authorization header: ${rawApiKey.substring(0, 15)}...`);
+    console.log(`[authWorkerValidation]   - X-Calling-Service: ${authRequest.headers.get('X-Calling-Service')}`);
+
     const authResponse = await env.AUTH_VALIDATION_WORKER.fetch(authRequest);
     console.log(`[authWorkerValidation] Sent request to AUTH_VALIDATION_WORKER binding.`);
     console.log(`[authWorkerValidation] Auth Worker Response Status: ${authResponse.status} ${authResponse.statusText}`);
