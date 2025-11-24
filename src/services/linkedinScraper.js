@@ -20,19 +20,71 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   console.log(`[linkedinScraper] Received response with status ${response.status}`);
   const remoteIp = response.headers.get('CF-Connecting-IP') || response.headers.get('X-Forwarded-For') || 'unknown';
   console.log(`[linkedinScraper] Remote IP (via proxy): ${remoteIp}`);
+
+  // --- ERROR HANDLING START ---
+  if (response.status === 404) {
+    return {
+      error: new Response(JSON.stringify({ error: "COMPANY_NOT_FOUND" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
+  }
+
+  if ([403, 429, 999].includes(response.status)) {
+    return {
+      error: new Response(JSON.stringify({ error: "BLOCKED_BY_LINKEDIN" }), {
+        status: 429,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
+  }
+
+  if (!response.ok) {
+    return {
+      error: new Response(JSON.stringify({ error: `HTTP_ERROR_${response.status}` }), {
+        status: response.status,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
+  }
+
+  // --- ERROR HANDLING END ---
+
   const finalUrl = response.url;
   const html = await response.text();
+
+  // Check for Authwall
+  const lowerHtml = html.toLowerCase();
+  if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
+    return {
+      error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
+  }
 
   // Extract JSON-LD data
   const { jsonLd, error: jsonLdError } = extractJsonLd(html);
   if (jsonLdError) {
-    return { error: jsonLdError };
+    return {
+      error: new Response(JSON.stringify({ error: "DATA_EXTRACTION_FAILED", details: jsonLdError }), {
+        status: 422,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
   }
 
   // Extract Organization data from JSON-LD
   const { organization, error: orgDataError } = getOrganizationData(jsonLd);
   if (orgDataError) {
-    return { error: orgDataError };
+    return {
+      error: new Response(JSON.stringify({ error: "ORGANIZATION_DATA_MISSING", details: orgDataError }), {
+        status: 422,
+        headers: { "Content-Type": "application/json" }
+      })
+    };
   }
 
   // Extract all company details using the orchestrator
