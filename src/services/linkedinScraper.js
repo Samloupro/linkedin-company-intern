@@ -54,20 +54,22 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   const finalUrl = response.url;
   const html = await response.text();
 
-  // Check for Authwall
-  const lowerHtml = html.toLowerCase();
-  if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
-    return {
-      error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" }
-      })
-    };
-  }
-
   // Extract JSON-LD data
   const { jsonLd, error: jsonLdError } = extractJsonLd(html);
+
+  // If JSON-LD extraction fails, THEN check for Authwall
   if (jsonLdError) {
+    // Check for Authwall
+    const lowerHtml = html.toLowerCase();
+    if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
+      return {
+        error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" }
+        })
+      };
+    }
+
     return {
       error: new Response(JSON.stringify({ error: "DATA_EXTRACTION_FAILED", details: jsonLdError }), {
         status: 422,
@@ -79,6 +81,17 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   // Extract Organization data from JSON-LD
   const { organization, error: orgDataError } = getOrganizationData(jsonLd);
   if (orgDataError) {
+    // Also check for Authwall here if organization data is missing but JSON-LD was technically found (rare but possible)
+    const lowerHtml = html.toLowerCase();
+    if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
+      return {
+        error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" }
+        })
+      };
+    }
+
     return {
       error: new Response(JSON.stringify({ error: "ORGANIZATION_DATA_MISSING", details: orgDataError }), {
         status: 422,
