@@ -1,4 +1,4 @@
-import { validateApiKey } from '../utils/apiKeyValidation.js';
+
 import { processRequest } from '../services/requestProcessor.js';
 import { checkCache, storeCache, clearCache } from '../services/cacheManager.js';
 import { scrapeCompanyData } from '../services/linkedinScraper.js';
@@ -7,11 +7,7 @@ import { formatCompanyResponse } from '../services/responseFormatter.js'; // New
 export default {
   async fetch(request, env, ctx) {
 
-    // Validate the API key using KV
-    const { error: apiKeyError } = await validateApiKey(request, env);
-    if (apiKeyError) {
-      return apiKeyError;
-    }
+
 
     const urlObj = new URL(request.url);
     if (urlObj.pathname === "/clear-cache") {
@@ -32,13 +28,13 @@ export default {
     let cacheKey = null;
 
     if (useCache) { // If useCache is true, we check the cache
-        const cacheResult = await checkCache(url, request.headers);
-        cachedResponse = cacheResult.cachedResponse;
-        cacheKey = cacheResult.cacheKey;
+      const cacheResult = await checkCache(url, request.headers);
+      cachedResponse = cacheResult.cachedResponse;
+      cacheKey = cacheResult.cacheKey;
 
-        if (cachedResponse) {
-            return cachedResponse; // Return cached response if it exists
-        }
+      if (cachedResponse) {
+        return cachedResponse; // Return cached response if it exists
+      }
     }
 
     try {
@@ -64,8 +60,8 @@ export default {
       return finalResponse;
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" }
+        status: 500,
+        headers: { "Content-Type": "application/json" }
       });
     }
   }
