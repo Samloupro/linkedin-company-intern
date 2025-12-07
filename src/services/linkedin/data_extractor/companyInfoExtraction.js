@@ -1,25 +1,41 @@
 import { decodeHtmlEntities } from './htmlUtils.js';
 
 export function extractCompanyGeneralInfo(html, jsonLd, organization, finalUrl) {
-  // Extraction de l'année de fondation ("Founded Year") en tant que variable numérique
-  const foundedYearMatch = html.match(/<dt[^>]*>\s*Founded\s*<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/i);
-  const foundedYearText = foundedYearMatch ? foundedYearMatch[1].replace(/<[^>]+>/g, "").trim() : null;
-  const foundedYear = foundedYearText ? parseInt(foundedYearText, 10) : null;
-  // Extraction des spécialités
-  const specialtiesMatch = html.match(/<dt[^>]*>\s*Specialties\s*<\/dt>[\s\S]*?<dd[^>]*>([\s\S]*?)<\/dd>/);
-  const specialties = specialtiesMatch ? decodeHtmlEntities(specialtiesMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
-  // Extraction de l'industrie
-  const industryMatch = html.match(/<dt[^>]*>\s*Industry\s*<\/dt>[\s\S]*?<dd[^>]*>([\s\S]*?)<\/dd>/);
-  const industry = industryMatch ? decodeHtmlEntities(industryMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
-  // Extraction du siège social (Headquarters)
-  const headquartersMatch = html.match(/<dt[^>]*>\s*Headquarters\s*<\/dt>[\s\S]*?<dd[^>]*>([\s\S]*?)<\/dd>/);
-  const headquarters = headquartersMatch ? decodeHtmlEntities(headquartersMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
+  // Initializing variables
+  let foundedYear = null;
+  let specialties = "";
+  let industry = "";
+  let headquarters = "";
+
+  // Unified regex to find all dt/dd pairs
+  // This loop replaces 4 separate full-text scans with 1
+  const infoRegex = /<dt[^>]*>\s*(Founded|Specialties|Industry|Headquarters)\s*<\/dt>[\s\S]*?<dd[^>]*>([\s\S]*?)<\/dd>/gi;
+  let match;
+  while ((match = infoRegex.exec(html)) !== null) {
+    const key = match[1].toLowerCase().trim();
+    const val = decodeHtmlEntities(match[2].replace(/<[^>]+>/g, "").trim());
+
+    switch (key) {
+      case 'founded':
+        foundedYear = parseInt(val, 10) || null;
+        break;
+      case 'specialties':
+        specialties = val;
+        break;
+      case 'industry':
+        industry = val;
+        break;
+      case 'headquarters':
+        headquarters = val;
+        break;
+    }
+  }
 
   // Extract company logo
   const companyLogo = organization.logo?.contentUrl ||
-                      html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1] ||
-                      "";
-    // Extract cover image
+    html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1] ||
+    "";
+  // Extract cover image
   const coverImageMatch = html.match(/(<img[^>]*class="cover-img__image[^>]*" src="([^"]*)"[^>]*>)/i);
   let companyCoverImage = coverImageMatch ? coverImageMatch[2] : ""; // Capture group 2 is the src attribute value
 
