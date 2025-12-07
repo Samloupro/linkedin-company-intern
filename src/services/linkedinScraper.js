@@ -12,7 +12,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
       'User-Agent': 'Mozilla/5.0 (compatible; Cloudflare-Worker/1.0)'
     },
     timeout: 3000
-  }, 3);
+  }, 3, 500);
 
   const finalUrl = response.url;
 
