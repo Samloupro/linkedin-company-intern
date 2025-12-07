@@ -2,6 +2,9 @@ import retryFetch from '../utils/retryFetch.js';
 import { extractJsonLd, getOrganizationData } from './linkedin/jsonLdProcessor.js';
 import { extractCompanyDetails } from './linkedin/data_extractor/index.js';
 
+const AUTHWALL_REGEX = /authwall|sign in|join linkedin/i;
+
+
 export async function scrapeCompanyData(url, requestHeaders, env) {
 
   const response = await retryFetch(url, {
@@ -52,9 +55,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   // If JSON-LD extraction fails, THEN check for Authwall
   if (jsonLdError) {
     // Check for Authwall
-    // Check for Authwall
-    const authWallRegex = /authwall|sign in|join linkedin/i;
-    if (authWallRegex.test(html)) {
+    if (AUTHWALL_REGEX.test(html)) {
       return {
         error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
           status: 403,
@@ -75,9 +76,7 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   const { organization, error: orgDataError } = getOrganizationData(jsonLd);
   if (orgDataError) {
     // Also check for Authwall here if organization data is missing but JSON-LD was technically found (rare but possible)
-    // Also check for Authwall here if organization data is missing but JSON-LD was technically found (rare but possible)
-    const authWallRegex = /authwall|sign in|join linkedin/i;
-    if (authWallRegex.test(html)) {
+    if (AUTHWALL_REGEX.test(html)) {
       return {
         error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
           status: 403,
