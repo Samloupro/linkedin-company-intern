@@ -10,8 +10,6 @@ crons = []
 [observability.logs]
 enabled = true
 
-[[kv_namespaces]]
-binding = "KV_PROXY"
-id = "86af15cd5a96445e921618842e38abd8"
+
 
 
