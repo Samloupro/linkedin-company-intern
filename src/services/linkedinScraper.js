@@ -52,8 +52,9 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   // If JSON-LD extraction fails, THEN check for Authwall
   if (jsonLdError) {
     // Check for Authwall
-    const lowerHtml = html.toLowerCase();
-    if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
+    // Check for Authwall
+    const authWallRegex = /authwall|sign in|join linkedin/i;
+    if (authWallRegex.test(html)) {
       return {
         error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
           status: 403,
@@ -74,8 +75,9 @@ export async function scrapeCompanyData(url, requestHeaders, env) {
   const { organization, error: orgDataError } = getOrganizationData(jsonLd);
   if (orgDataError) {
     // Also check for Authwall here if organization data is missing but JSON-LD was technically found (rare but possible)
-    const lowerHtml = html.toLowerCase();
-    if (lowerHtml.includes("authwall") || lowerHtml.includes("sign in") || lowerHtml.includes("join linkedin")) {
+    // Also check for Authwall here if organization data is missing but JSON-LD was technically found (rare but possible)
+    const authWallRegex = /authwall|sign in|join linkedin/i;
+    if (authWallRegex.test(html)) {
       return {
         error: new Response(JSON.stringify({ error: "AUTH_WALL_DETECTED" }), {
           status: 403,
